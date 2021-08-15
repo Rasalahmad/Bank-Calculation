@@ -1,75 +1,70 @@
-function getInputValue() {
-    const depositInput = document.getElementById('deposit-input');
-    const depositInputText = depositInput.value;
-    const newDepositInputAmount = parseFloat(depositInputText);
+// common function for input
+function getInputValue(inputId) {
+    const inputField = document.getElementById(inputId);
+    const inputAmountText = inputField.value;
+    const amountValue = parseFloat(inputAmountText);
     // clear depost input field
-    depositInput.value = '';
-    return newDepositInputAmount;
+    inputField.value = '';
+    return amountValue;
 }
 
+function updateTotalField(totalFieldId, amount) {
+    const totalElement = document.getElementById(totalFieldId);
+    const totalText = totalElement.innerText;
+    const depositBalanceTotal = parseFloat(totalText);
+    const previousTotal = amount + depositBalanceTotal;
+    totalElement.innerText = previousTotal;
+}
 
-
-
-
-
-// handle deposit
-document.getElementById('deposit-button').addEventListener('click', function() {
-    // access input field
-    /* const depositInput = document.getElementById('deposit-input');
-    const depositInputText = depositInput.value;
-    const newDepositInputAmount = parseFloat(depositInputText); */
-
-    const newDepositInputAmount = getInputValue();
-
-    // update deposit amount
-    const depositBalance = document.getElementById('deposit-total');
-    const depositBalanceText = depositBalance.innerText;
-    const depositBalanceTotal = parseFloat(depositBalanceText);
-
-    const totalDeposit = newDepositInputAmount + depositBalanceTotal;
-
-    depositBalance.innerText = totalDeposit;
-    // update balance
+function getCurrentBalance() {
     const totalBalance = document.getElementById('balance-total');
     const totalBalanceInputText = totalBalance.innerText;
     const totalBalanceAmount = parseFloat(totalBalanceInputText);
-    const newTotalBalance = totalBalanceAmount + newDepositInputAmount;
-    totalBalance.innerText = newTotalBalance;
+    return totalBalanceAmount;
+}
 
-    /* // clear depost input field
-    depositInput.value = ''; */
+function updateBalance(amount, isAdd) {
+    const totalBalance = document.getElementById('balance-total');
+    /* const totalBalanceInputText = totalBalance.innerText;
+    const totalBalanceAmount = parseFloat(totalBalanceInputText); */
+    const totalBalanceAmount = getCurrentBalance();
+    if (isAdd == true) {
+        const newTotalBalance = totalBalanceAmount + amount;
+        totalBalance.innerText = newTotalBalance;
+    } else {
+        const newTotalBalance = totalBalanceAmount - amount;
+        totalBalance.innerText = newTotalBalance;
+    }
+}
+// handle deposit
+document.getElementById('deposit-button').addEventListener('click', function() {
+    const newDepositInputAmount = getInputValue('deposit-input');
+    if (newDepositInputAmount > 0) {
+        // update deposit amount
+        updateTotalField('deposit-total', newDepositInputAmount);
+
+        // update balance
+        updateBalance(newDepositInputAmount, true);
+    } else {
+        alert('Invalid Input!!!')
+    }
+
 });
 
 // handle withdraw
 document.getElementById('withdrow-button').addEventListener('click', function() {
-    // access withdraw input
-    const withdrawInput = document.getElementById('withdrow-input');
-    const withdrawAmountText = withdrawInput.value;
-    const newWithdrawAmount = parseFloat(withdrawAmountText);
+    const newWithdrawAmount = getInputValue('withdrow-input');
+    const currentBalance = getCurrentBalance();
+    if (newWithdrawAmount > 0 && newWithdrawAmount < currentBalance) {
+        // update withdraw balance
+        updateTotalField('withdraw-total', newWithdrawAmount);
 
-
-    // update withdraw balance
-    const withdrawBalance = document.getElementById('withdraw-total');
-    const withdrawBalanceText = withdrawBalance.innerText;
-    const withdrawAmount = parseFloat(withdrawBalanceText);
-
-    const totalWithdraw = newWithdrawAmount + withdrawAmount;
-    withdrawBalance.innerText = totalWithdraw;
-
-    // update total balance
-    const totalBalance = document.getElementById('balance-total');
-    const totalBalanceInputText = totalBalance.innerText;
-    const totalBalanceAmount = parseFloat(totalBalanceInputText);
-
-
-    const newTotalBalance = totalBalanceAmount - newWithdrawAmount;
-    totalBalance.innerText = newTotalBalance;
-
-
-    // clear withdraw input
-    withdrawInput.value = '';
-
-})
+        // update total balance
+        updateBalance(newWithdrawAmount, false);
+    } else {
+        alert('You have not enough balace');
+    }
+});
 
 
 
